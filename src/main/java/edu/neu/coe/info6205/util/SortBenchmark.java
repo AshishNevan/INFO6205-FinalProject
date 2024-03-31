@@ -3,8 +3,13 @@
  */
 package edu.neu.coe.info6205.util;
 
-import edu.neu.coe.info6205.sort.*;
-import edu.neu.coe.info6205.sort.elementary.*;
+import edu.neu.coe.info6205.sort.BaseHelper;
+import edu.neu.coe.info6205.sort.Helper;
+import edu.neu.coe.info6205.sort.SortWithHelper;
+import edu.neu.coe.info6205.sort.elementary.BubbleSort;
+import edu.neu.coe.info6205.sort.elementary.InsertionSort;
+import edu.neu.coe.info6205.sort.elementary.RandomSort;
+import edu.neu.coe.info6205.sort.elementary.ShellSort;
 import edu.neu.coe.info6205.sort.linearithmic.TimSort;
 import edu.neu.coe.info6205.sort.linearithmic.*;
 
@@ -95,11 +100,6 @@ public class SortBenchmark {
         if (isConfigBenchmarkStringSorter("quicksort"))
             runStringSortBenchmark(words, nWords, nRuns, new QuickSort_Basic<>(nWords, config), timeLoggersLinearithmic);
 
-        if (isConfigBenchmarkStringSorter("heapsort")) {
-            InstrumentedHelper<String> helper = new InstrumentedHelper<>("heapsort", nWords, config);
-            runStringSortBenchmark(words, nWords, nRuns, new HeapSort<>(helper), timeLoggersLinearithmic);
-        }
-
         if (isConfigBenchmarkStringSorter("introsort"))
             runStringSortBenchmark(words, nWords, nRuns, new IntroSort<>(nWords, config), timeLoggersLinearithmic);
 
@@ -142,11 +142,6 @@ public class SortBenchmark {
 
         if (isConfigBenchmarkStringSorter("quicksort"))
             runStringSortBenchmark(words, nWords, nRuns, new QuickSort_Basic<>(nWords, config), timeLoggersLinearithmic);
-
-        if (isConfigBenchmarkStringSorter("heapsort")) {
-            Helper<String> helper = HelperFactory.create("Heapsort", nWords, config);
-            runStringSortBenchmark(words, nWords, nRuns, new HeapSort<>(helper), timeLoggersLinearithmic);
-        }
 
         if (isConfigBenchmarkStringSorter("introsort"))
             runStringSortBenchmark(words, nWords, nRuns, new IntroSort<>(nWords, config), timeLoggersLinearithmic);
@@ -212,7 +207,6 @@ public class SortBenchmark {
      */
     static void runStringSortBenchmark(String[] words, int nWords, int nRuns, SortWithHelper<String> sorter, UnaryOperator<String[]> preProcessor, TimeLogger[] timeLoggers) {
         new SorterBenchmark<>(String.class, preProcessor, sorter, words, nRuns, timeLoggers).run(nWords);
-        logger.info(sorter.getHelper().showStats());
         sorter.close();
     }
 

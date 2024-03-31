@@ -4,7 +4,6 @@
 
 package edu.neu.coe.info6205.randomwalk;
 
-import java.lang.Math;
 import java.util.Random;
 
 public class RandomWalk {
@@ -21,8 +20,9 @@ public class RandomWalk {
      * @param dy the distance he moves in the y direction
      */
     private void move(int dx, int dy) {
-        x += dx;
-        y += dy;
+        // TO BE IMPLEMENTED  do move
+         throw new RuntimeException("Not implemented");
+        // END SOLUTION
     }
 
     /**
@@ -31,9 +31,8 @@ public class RandomWalk {
      * @param m the number of steps the drunkard takes
      */
     private void randomWalk(int m) {
-        for(int i =0;i<m;i++) {
-            randomMove();
-        }
+        // TO BE IMPLEMENTED 
+throw new RuntimeException("implementation missing");
     }
 
     /**
@@ -52,7 +51,9 @@ public class RandomWalk {
      * @return the (Euclidean) distance from the origin to the current position.
      */
     public double distance() {
-        return Math.sqrt(x*x + y*y);
+        // TO BE IMPLEMENTED 
+         return 0.0;
+        // END SOLUTION
     }
 
     /**

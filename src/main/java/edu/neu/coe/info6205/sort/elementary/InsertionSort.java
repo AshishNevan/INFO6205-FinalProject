@@ -8,7 +8,6 @@ import edu.neu.coe.info6205.sort.Helper;
 import edu.neu.coe.info6205.sort.SortWithHelper;
 import edu.neu.coe.info6205.util.Config;
 
-
 /**
  * Class InsertionSort.
  *
@@ -63,24 +62,9 @@ public class InsertionSort<X extends Comparable<X>> extends SortWithHelper<X> {
      */
     public void sort(X[] xs, int from, int to) {
         final Helper<X> helper = getHelper();
-        if (getHelper().instrumented()) {
-            for (int i = from; i < to; i++) {
-                for (int j = i; j > from; j--){
-                    if (!helper.swapStableConditional(xs, j)) {
-                        break;
-                    }
-                }
-            }
-        }
-        else {
-            for (int i = from; i < to; i++) {
-                for (int j = i; j > from && (xs[j-1].compareTo(xs[j])>0); j--) {
-                    X temp = xs[j];
-                    xs[j] = xs[j-1];
-                    xs[j-1] = temp;
-                    }
-                }
-            }
+
+        // TO BE IMPLEMENTED 
+throw new RuntimeException("implementation missing");
     }
 
     public static final String DESCRIPTION = "Insertion sort";

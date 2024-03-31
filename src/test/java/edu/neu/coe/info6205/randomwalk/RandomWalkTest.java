@@ -86,15 +86,4 @@ public class RandomWalkTest {
         for (int i = 0; i < 5000; i++)
             assertNotSame(0, RandomWalk.randomWalkMulti(1, 1));
     }
-
-    @Test
-    public void testRandomWalkAssignment1() {
-        int[] testM = new int[]{0,1,12,25,105,255};
-        int n = 10;
-        for (int j : testM) {
-            double meanDistance = RandomWalk.randomWalkMulti(j, n);
-            System.out.println(j + " steps: " + meanDistance + " over " + n + " experiments");
-            assertEquals(Math.sqrt(j), meanDistance, 6);
-        }
-    }
 }

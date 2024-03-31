@@ -39,7 +39,6 @@ public class MergeSort<X extends Comparable<X>> extends SortWithHelper<X> {
         insertionSort = new InsertionSort<>(getHelper());
     }
 
-    @Override
     public X[] sort(X[] xs, boolean makeCopy) {
         getHelper().init(xs.length);
         X[] result = makeCopy ? Arrays.copyOf(xs, xs.length) : xs;
@@ -47,7 +46,6 @@ public class MergeSort<X extends Comparable<X>> extends SortWithHelper<X> {
         return result;
     }
 
-    @Override
     public void sort(X[] a, int from, int to) {
         // CONSIDER don't copy but just allocate according to the xs/aux interchange optimization
         X[] aux = Arrays.copyOf(a, a.length);
@@ -63,28 +61,9 @@ public class MergeSort<X extends Comparable<X>> extends SortWithHelper<X> {
             insertionSort.sort(a, from, to);
             return;
         }
-        int mid = from + (to - from) / 2;
-        if (noCopy) {
-            sort(aux, a, from, mid);
-            sort(aux, a, mid, to);
-            merge(aux, a, from, mid, to);
-        } else {
-            sort(a, aux, from, mid);
-            sort(a, aux, mid, to);
-            // skip merge if already in order
-            if (helper.less(a[mid-1],a[mid])) return;
-            merge(a, aux, from, mid, to);
-            if (!insurance) {
-                System.arraycopy(aux, from, a, from, to - from);
-            }
-            if (insurance) {
-                for (int i = from + 1; i < to; i++) {
-                    if (helper.less(a[i], a[i - 1])) {
-                        throw new RuntimeException("insurance err");
-                    }
-                }
-            }
-        }
+
+        // TO BE IMPLEMENTED  : implement merge sort with insurance and no-copy optimizations
+throw new RuntimeException("implementation missing");
     }
 
     // CONSIDER combine with MergeSortBasic perhaps.

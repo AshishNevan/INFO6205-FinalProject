@@ -1,13 +1,12 @@
 package edu.neu.coe.info6205.threesum;
 
-import edu.neu.coe.info6205.util.Stopwatch;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
+
 import static org.junit.Assert.assertEquals;
 
 public class ThreeSumTest {
@@ -154,68 +153,4 @@ public class ThreeSumTest {
         assertEquals(triplesCubic.length, triplesQuadratic.length);
     }
 
-    @Test
-    public void stopwatchQuadratic() {
-
-        List<ThreeSum> listOfQuadraticCalipers = new ArrayList<>();
-        List<ThreeSum> listOfQuadratic = new ArrayList<>();
-        List<ThreeSum> listOfQuadrithmic = new ArrayList<>();
-        List<ThreeSum> listOfCubic = new ArrayList<>();
-
-        for (int i=250;i<=5000;i*=2) {
-            Supplier<int[]> intsSupplier = new Source(i, 1000).intsSupplier(10);
-            int[] ints = intsSupplier.get();
-            listOfQuadraticCalipers.add(new ThreeSumQuadraticWithCalipers(ints));
-            listOfQuadratic.add(new ThreeSumQuadratic(ints));
-            listOfQuadrithmic.add(new ThreeSumQuadrithmic(ints));
-            listOfCubic.add(new ThreeSumCubic(ints));
-        }
-
-        System.out.printf("----------------------------------------------------------%n");
-        System.out.printf("| %-30s | %10s |%10s|\n", "Algorithm", "input size", "Time in ms");
-        System.out.printf("----------------------------------------------------------%n");
-        String algoName = "Quadratic with Calipers";
-        int count = 250;
-        for (ThreeSum target: listOfQuadraticCalipers) {
-            try (Stopwatch sw = new Stopwatch()) {
-                target.getTriples();
-                System.out.printf("| %-30s | %10s |%10s|\n", algoName, count,sw.lap());
-            }
-            count*=2;
-        }
-
-        System.out.printf("----------------------------------------------------------%n");
-        algoName = "Quadratic";
-        count = 250;
-        for (ThreeSum target: listOfQuadratic) {
-            try (Stopwatch sw = new Stopwatch()) {
-                target.getTriples();
-                System.out.printf("| %-30s | %10s |%10s|\n", algoName, count,sw.lap());
-            }
-            count*=2;
-        }
-
-        System.out.printf("----------------------------------------------------------%n");
-        algoName = "Quadrithmic";
-        count = 250;
-        for (ThreeSum target: listOfQuadrithmic) {
-            try (Stopwatch sw = new Stopwatch()) {
-                target.getTriples();
-                System.out.printf("| %-30s | %10s |%10s|\n", algoName, count,sw.lap());
-            }
-            count*=2;
-        }
-
-        System.out.printf("----------------------------------------------------------%n");
-        algoName = "Cubic";
-        count = 250;
-        for (ThreeSum target: listOfCubic) {
-            try (Stopwatch sw = new Stopwatch()) {
-                target.getTriples();
-                System.out.printf("| %-30s | %10s |%10s|\n", algoName, count,sw.lap());
-            }
-            count*=2;
-        }
-        System.out.printf("----------------------------------------------------------%n");
-    }
 }
