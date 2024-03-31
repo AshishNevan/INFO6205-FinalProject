@@ -13,12 +13,12 @@ public class Timer {
     /**
      * Run the given function n times, once per "lap" and then return the result of calling meanLapTime().
      * The clock will be running when the method is invoked and when it is quit.
-     * <p>
+     *
      * This is the simplest form of repeat.
      *
      * @param n        the number of repetitions.
      * @param function a function which yields a T.
-     * @param <T>      the type supplied by function (amy be Void).
+     * @param <T> the type supplied by function (amy be Void).
      * @return the average milliseconds per repetition.
      */
     public <T> double repeat(int n, Supplier<T> function) {
@@ -38,8 +38,8 @@ public class Timer {
      * @param n        the number of repetitions.
      * @param supplier a function which supplies a different T value for each repetition.
      * @param function a function T=>U and which is to be timed.
-     * @param <T>      the type which is supplied by supplier and passed in to function.
-     * @param <U>      the type which is the result of <code>function</code> (may be Void).
+     * @param <T> the type which is supplied by supplier and passed in to function.
+     * @param <U> the type which is the result of <code>function</code> (may be Void).
      * @return the average milliseconds per repetition.
      */
     public <T, U> double repeat(int n, Supplier<T> supplier, Function<T, U> function) {
@@ -55,41 +55,14 @@ public class Timer {
      * @param function     a function T=>U and which is to be timed.
      * @param preFunction  a function which pre-processes a T value and which precedes the call of function, but which is not timed (may be null). The result of the preFunction, if any, is also a T.
      * @param postFunction a function which consumes a U and which succeeds the call of function, but which is not timed (may be null).
-     * @param <T>          the type which is supplied by supplier, processed by prefunction (if any), and passed in to function.
-     * @param <U>          the type which is the result of function and the input to postFunction (if any).
+     * @param <T> the type which is supplied by supplier, processed by prefunction (if any), and passed in to function.
+     * @param <U> the type which is the result of function and the input to postFunction (if any).
      * @return the average milliseconds per repetition.
      */
     public <T, U> double repeat(int n, boolean warmup, Supplier<T> supplier, Function<T, U> function, UnaryOperator<T> preFunction, Consumer<U> postFunction) {
-
-        pause();
-
-        for (int i = 0; i < n; i++) {
-
-            T input = supplier.get();
-            U output = null;
-
-            if (preFunction != null) {
-                input = preFunction.apply(input);
-            }
-
-            if (warmup) {
-                output = function.apply(input);
-            }
-            else {
-                resume();
-                output = function.apply(input);
-                lap();
-                pause();
-            }
-
-            if (postFunction != null) {
-                postFunction.accept(output);
-            }
-        }
-
-        final double result = meanLapTime();
-        resume();
-        return result;
+        // TO BE IMPLEMENTED : note that the timer is running when this method is called and should still be running when it returns.
+         return 0;
+        // END SOLUTION
     }
 
     /**
@@ -214,7 +187,9 @@ public class Timer {
      * @return the number of ticks for the system clock. Currently defined as nano time.
      */
     private static long getClock() {
-        return System.nanoTime();
+        // TO BE IMPLEMENTED 
+         return 0;
+        // END SOLUTION
     }
 
     /**
@@ -225,7 +200,9 @@ public class Timer {
      * @return the corresponding number of milliseconds.
      */
     private static double toMillisecs(long ticks) {
-        return (double) ticks / 1e+6;
+        // TO BE IMPLEMENTED 
+         return 0;
+        // END SOLUTION
     }
 
     final static LazyLogger logger = new LazyLogger(Timer.class);
