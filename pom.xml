@@ -7,7 +7,7 @@
 
 <project>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>edu.neu.coe.mgen</groupId>
+    <groupId>src</groupId>
     <artifactId>INFO6205</artifactId>
     <version>1</version>
     <build>
