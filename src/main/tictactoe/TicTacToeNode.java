@@ -1,10 +1,12 @@
 package tictactoe;
 
+import core.Move;
 import core.Node;
 import core.State;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Optional;
 
 public class TicTacToeNode implements Node<TicTacToe> {
@@ -62,6 +64,17 @@ public class TicTacToeNode implements Node<TicTacToe> {
         }
     }
 
+    public TicTacToeNode getBestChild() {
+        return (TicTacToeNode) children.stream()
+                .max(Comparator.comparing(c -> c.wins() / (c.playouts()+epsilon) + Math.sqrt(Math.log(c.playouts()+1) / (c.playouts() + epsilon ))))
+                .orElseThrow(() -> new RuntimeException("No children"));
+    }
+
+    public boolean isFullyExpanded() {
+        TicTacToe.TicTacToeState s = (TicTacToe.TicTacToeState) state;
+        return children.size() == s.moves(s.player()).size();
+    }
+
     /**
      * @return the score for this Node and its descendents a win is worth 2 points, a draw is worth 1 point.
      */
@@ -98,4 +111,5 @@ public class TicTacToeNode implements Node<TicTacToe> {
 
     private int wins;
     private int playouts;
+    static double epsilon = 1e-6;
 }
