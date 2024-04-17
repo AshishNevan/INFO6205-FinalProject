@@ -2,11 +2,10 @@ package tictactoe;
 
 import core.Move;
 import core.Node;
-import core.State;
 
 import java.util.Collection;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Class to represent a Monte Carlo Tree Search for TicTacToe.
@@ -20,20 +19,12 @@ public class MCTS {
     }
 
     public static void main(String[] args) {
-        // MCTS mcts = new MCTS(new TicTacToeNode(new TicTacToe().new TicTacToeState()));
-        // Node<TicTacToe> root = mcts.root;
-        // long end = System.currentTimeMillis()+1000;
-        // while(System.currentTimeMillis() < end) {
-        //     State<TicTacToe> leaf = mcts.runGame();
-        //     root.explore();
-        //     return root.bestChild();
-        // }
         TicTacToe game = new TicTacToe();
         TicTacToeNode root = new TicTacToeNode(game.new TicTacToeState());
         MCTS mcts = new MCTS(root);
-        int user = 1 - game.opener();
-        Scanner sc = new Scanner(System.in);
-        System.out.println(((TicTacToe.TicTacToeState) root.state()).position().render());
+//        int user = 1 - game.opener();
+//        Scanner sc = new Scanner(System.in);
+//        System.out.println(((TicTacToe.TicTacToeState) root.state()).position().render());
 //        while (!root.state().isTerminal()) {
 //            if (root.state().player() == user) {
 //                try {
@@ -41,10 +32,10 @@ public class MCTS {
 //                    String userMove = sc.nextLine();
 ////                    System.out.println("User input is " + userMove);
 //                    String[] XY = userMove.split(",");
-////                    System.out.println(Arrays.toString(XY));
 //                    Position newPosition = ((TicTacToe.TicTacToeState) root.state()).position().move(TicTacToe.O, Integer.parseInt(XY[0]), Integer.parseInt(XY[1]));
-//                    root = new TicTacToeNode(game.new TicTacToeState(newPosition));
-//                    mcts = new MCTS(root);
+//                    Node<TicTacToe> childNode = findChildWithPosition(root, newPosition);
+//                    System.out.println(childNode.state().toString());
+//                    root = (TicTacToeNode) childNode;
 //                } catch (Exception e) {
 //                    System.out.println(e);
 //                    System.out.println("Enter valid input");
@@ -56,10 +47,12 @@ public class MCTS {
 //                mcts = new MCTS(root);
 //            }
 //        }
+
         while (!root.state().isTerminal()) {
             root = mcts.getBestMove();
             System.out.println("Player " + (root.state().player() == 0 ? "X" : "O") + " makes a move.");
             System.out.println(((TicTacToe.TicTacToeState) root.state()).position().render());
+            root = new TicTacToeNode(root.state());
             mcts = new MCTS(root);
         }
 
@@ -76,51 +69,96 @@ public class MCTS {
         }
     }
 
-    public TicTacToeNode getBestMove() {
-        for (int i = 0; i < 2000; i++) {
-            TicTacToeNode node = select((TicTacToeNode) root);
-            if (!node.isLeaf()) {
-//                node.explore();
-                node = expand(node);
-            }
-            State<TicTacToe> endState = simulate(node);
-            TicTacToeNode endNode = new TicTacToeNode(endState);
-            backpropagate(node, endNode);
+    public static double uctValue(
+            int totalVisit, double nodeWinScore, int nodeVisit) {
+        if (nodeVisit == 0) {
+            return Integer.MAX_VALUE;
         }
-
-        return ((TicTacToeNode) root).getBestChild();
+        return (nodeWinScore / (double) nodeVisit)
+                + 1.41 * Math.sqrt(Math.log(totalVisit) / (double) nodeVisit);
     }
 
-    private TicTacToeNode select(TicTacToeNode node) {
-        while (!node.isLeaf()) {
-            if (!node.isFullyExpanded()) {
-                return node;
-            } else {
-                node = node.getBestChild();
+    public TicTacToeNode getBestMove() {
+        int currentPlayer = root.state().player();
+        for (int i = 0; i < 1000; i++) {
+            TicTacToeNode node = select((TicTacToeNode) root);
+            if (!node.isLeaf()) {
+                expand(node);
             }
+            TicTacToeNode nodeToExplore = node;
+            if (!node.children().isEmpty())
+                nodeToExplore = pickRandomChild(node.children());
+            Node<TicTacToe> endNode = simulate(nodeToExplore);
+            backpropagate(nodeToExplore, (TicTacToeNode) endNode, currentPlayer);
+        }
+        return (TicTacToeNode) ((TicTacToeNode) root).getChildWithMaxWins();
+    }
+
+    public TicTacToeNode select(TicTacToeNode node) {
+        while (!node.children().isEmpty()) {
+            node = getBestChild(node);
         }
         return node;
     }
 
-    private TicTacToeNode expand(TicTacToeNode node) {
-        TicTacToe.TicTacToeState currenState = (TicTacToe.TicTacToeState) node.state();
-        Collection<Move<TicTacToe>> possibleMoves = currenState.moves(currenState.player());
-        node.addChild(currenState.next(currenState.moves(currenState.player()).stream().skip(new Random().nextInt(currenState.moves(currenState.player()).size())).findFirst().get()));
-        return (TicTacToeNode) node.children().stream().reduce((first, second) -> second).orElse(null);
+    public TicTacToeNode getBestChild(TicTacToeNode node) {
+        return (TicTacToeNode) Collections.max(
+                node.children(),
+                Comparator.comparing(c -> uctValue(node.playouts(),
+                        c.wins(), c.playouts())));
     }
 
-    private State<TicTacToe> simulate(TicTacToeNode node) {
-        TicTacToe.TicTacToeState state = (TicTacToe.TicTacToeState) node.state();
-        while (!state.isTerminal()) {
-            state = (TicTacToe.TicTacToeState) state.next(state.moves(state.player()).stream().skip(new Random().nextInt(state.moves(state.player()).size())).findFirst().get());
+    private TicTacToeNode UnvisitedChild(TicTacToeNode node) {
+        // return first child with playouts == 0
+        if (node.children().isEmpty()) {
+            expand(node);
+            return node;
         }
-        return state;
+        return (TicTacToeNode) node.children().stream().filter(child -> child.playouts() == 0).findFirst().orElseThrow(() -> new RuntimeException("No unvisited children"));
     }
 
-    private void backpropagate(TicTacToeNode parent, TicTacToeNode child) {
+    public boolean fullyExpanded(TicTacToeNode node) {
+        // true if all the children have playouts > 0
+        if (node.children().isEmpty()) {
+            return false;
+        }
+        return node.children().stream().allMatch(child -> child.playouts() > 0);
+    }
 
-        child.backPropagate();
-        parent.backPropagate();
+    public void expand(TicTacToeNode node) {
+        TicTacToe.TicTacToeState currentState = (TicTacToe.TicTacToeState) node.state();
+        Collection<Move<TicTacToe>> possibleMoves = currentState.moves(currentState.player());
+        for (Move<TicTacToe> possibleMove : possibleMoves) {
+            node.addChild(currentState.next(possibleMove));
+        }
+    }
+
+    private TicTacToeNode pickRandomChild(Collection<Node<TicTacToe>> children) {
+        return (TicTacToeNode) children.stream().skip(root.state().random().nextInt(children.size())).findFirst().orElseThrow(() -> new RuntimeException("No children"));
+    }
+
+    public Node<TicTacToe> simulate(TicTacToeNode node) {
+        while (!node.state().isTerminal()) {
+            if (node.children().isEmpty())
+                node.explore();
+            node = getBestChild(node);
+        }
+        return node;
+    }
+
+    public void backpropagate(TicTacToeNode node, TicTacToeNode endNode, int currentPlayer) {
+        if (endNode.state().winner().isPresent()) {
+            if (endNode.state().winner().get() == currentPlayer)
+                endNode.updateStats(endNode.wins(), endNode.playouts());
+            else
+                endNode.updateStats(0, endNode.playouts());
+        }
+        node.updateStats(endNode.wins(), endNode.playouts());
+        node = (TicTacToeNode) node.getParent();
+        while (node != null) {
+            node.backPropagate();
+            node = (TicTacToeNode) node.getParent();
+        }
     }
 
 }

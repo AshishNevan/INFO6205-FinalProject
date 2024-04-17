@@ -1,6 +1,5 @@
 package tictactoe;
 
-import core.Move;
 import core.Node;
 import core.State;
 
@@ -10,6 +9,26 @@ import java.util.Comparator;
 import java.util.Optional;
 
 public class TicTacToeNode implements Node<TicTacToe> {
+
+    private final State<TicTacToe> state;
+    private final ArrayList<Node<TicTacToe>> children;
+    private final Node<TicTacToe> parent;
+    private int wins;
+    private int playouts;
+
+    public TicTacToeNode(State<TicTacToe> state) {
+        this.state = state;
+        children = new ArrayList<>();
+        initializeNodeData(1-state.player());
+        parent = null;
+    }
+
+    public TicTacToeNode(State<TicTacToe> state, Node<TicTacToe> parent, int currentPlayer) {
+        this.state = state;
+        children = new ArrayList<>();
+        initializeNodeData(currentPlayer);
+        this.parent = parent;
+    }
 
     /**
      * @return true if this node is a leaf node (in which case no further exploration is possible).
@@ -49,7 +68,7 @@ public class TicTacToeNode implements Node<TicTacToe> {
      * @param state the State for the new chile.
      */
     public void addChild(State<TicTacToe> state) {
-        children.add(new TicTacToeNode(state));
+        children.add(new TicTacToeNode(state, this, state.player()));
     }
 
     /**
@@ -64,15 +83,14 @@ public class TicTacToeNode implements Node<TicTacToe> {
         }
     }
 
-    public TicTacToeNode getBestChild() {
-        return (TicTacToeNode) children.stream()
-                .max(Comparator.comparing(c -> c.wins() / (c.playouts()+epsilon) + Math.sqrt(Math.log(c.playouts()+1) / (c.playouts() + epsilon ))))
-                .orElseThrow(() -> new RuntimeException("No children"));
+    public void updateStats(int wins, int playouts) {
+        this.wins = wins;
+        this.playouts = playouts;
     }
 
-    public boolean isFullyExpanded() {
-        TicTacToe.TicTacToeState s = (TicTacToe.TicTacToeState) state;
-        return children.size() == s.moves(s.player()).size();
+    public Node<TicTacToe> getChildWithMaxWins() {
+//        return child with max wins
+        return children.stream().max(Comparator.comparingInt(Node::wins)).orElse(null);
     }
 
     /**
@@ -89,27 +107,17 @@ public class TicTacToeNode implements Node<TicTacToe> {
         return playouts;
     }
 
-    public TicTacToeNode(State<TicTacToe> state) {
-        this.state = state;
-        children = new ArrayList<>();
-        initializeNodeData();
-    }
-
-    private void initializeNodeData() {
+    private void initializeNodeData(int currentPlayer) {
         if (isLeaf()) {
             playouts = 1;
             Optional<Integer> winner = state.winner();
-            if (winner.isPresent())
-                wins = 2; // CONSIDER check that the winner is the correct player. We shouldn't need to.
-            else
-                wins = 1; // a draw.
+            //                wins = 2; // CONSIDER check that the winner is the correct player. We shouldn't need to.
+            // a draw.
+            wins = winner.map(integer -> integer == currentPlayer ? 2 : 0).orElse(1);
         }
     }
 
-    private final State<TicTacToe> state;
-    private final ArrayList<Node<TicTacToe>> children;
-
-    private int wins;
-    private int playouts;
-    static double epsilon = 1e-6;
+    public Node<TicTacToe> getParent() {
+        return parent;
+    }
 }
