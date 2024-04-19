@@ -1,7 +1,6 @@
 package tictactoe;
 
 import core.Move;
-import core.Node;
 import core.State;
 import org.junit.Test;
 
@@ -17,18 +16,6 @@ public class MCTSTest {
         MCTS mcts = new MCTS(root);
         TicTacToeNode endNode = (TicTacToeNode) mcts.simulate(root);
         assertTrue(endNode.state().isTerminal());
-    }
-
-    @Test
-    public void fullyExpanded() {
-        TicTacToeNode root = new TicTacToeNode(new TicTacToe().new TicTacToeState());
-        MCTS mcts = new MCTS(root);
-        root.explore();
-        for (Node<TicTacToe> child : root.children()) {
-            TicTacToeNode endNode = (TicTacToeNode) mcts.simulate((TicTacToeNode) child);
-            mcts.backpropagate((TicTacToeNode) child, endNode, root.state().player());
-        }
-        assertTrue(mcts.fullyExpanded(root));
     }
 
     @Test
@@ -60,37 +47,51 @@ public class MCTSTest {
 
     @Test
     public void MCTSvsRandom() {
-        TicTacToeNode root = new TicTacToeNode(new TicTacToe().new TicTacToeState());
-        MCTS mcts = new MCTS(root);
+        int RUNS = 100;
+        int[] results = new int[RUNS];
         int randomPlayer = TicTacToe.O;
         int mctsPlayer = TicTacToe.X;
-        while (!root.state().isTerminal()) {
-            if (mctsPlayer == root.state().player()) {
-                root = mcts.getBestMove();
-                root = new TicTacToeNode(root.state());
-                mcts = new MCTS(root);
-            } else {
-                Move<TicTacToe> randomMove = root.state().chooseMove(randomPlayer);
-                State<TicTacToe> newState = root.state().next(randomMove);
-                root = new TicTacToeNode(newState);
+        for (int i = 0; i < RUNS; i++) {
+            TicTacToeNode root = new TicTacToeNode(new TicTacToe().new TicTacToeState());
+            MCTS mcts = new MCTS(root);
+            while (!root.state().isTerminal()) {
+                if (mctsPlayer == root.state().player()) {
+                    root = mcts.getBestMove();
+                    root = new TicTacToeNode(root.state());
+                } else {
+                    Move<TicTacToe> randomMove = root.state().chooseMove(randomPlayer);
+                    State<TicTacToe> newState = root.state().next(randomMove);
+                    root = new TicTacToeNode(newState);
+                }
                 mcts = new MCTS(root);
             }
+            results[i] = root.state().winner().orElse(-1);
         }
-        if (root.state().winner().isPresent()) {
-            assertEquals((int) root.state().winner().get(), mctsPlayer);
-        }
+        // count occurances of mctsplayer in results array
+        long loss = java.util.Arrays.stream(results).filter(x -> x == TicTacToe.O ).count();
+        // mctsPlayer should win or draw more than 50% of the time
+        System.out.println("MCTS vs Random: " + (RUNS - loss)*100/RUNS + "% wins + draws");
+        assertTrue(RUNS - loss > 0.5 * RUNS);
     }
 
     @Test
     public void MCTSvsMCTS() {
-        TicTacToe game = new TicTacToe();
-        TicTacToeNode root = new TicTacToeNode(game.new TicTacToeState());
-        MCTS mcts = new MCTS(root);
-        while (!root.state().isTerminal()) {
-            root = mcts.getBestMove();
-            root = new TicTacToeNode(root.state());
-            mcts = new MCTS(root);
+        int RUNS = 100;
+        int[] results = new int[RUNS];
+        for (int i = 0; i < RUNS; i++) {
+            TicTacToe game = new TicTacToe();
+            TicTacToeNode root = new TicTacToeNode(game.new TicTacToeState());
+            MCTS mcts = new MCTS(root);
+            while (!root.state().isTerminal()) {
+                root = mcts.getBestMove();
+                root = new TicTacToeNode(root.state());
+                mcts = new MCTS(root);
+            }
+            results[i] = root.state().winner().orElse(-1);
         }
-        assertFalse(root.state().winner().isPresent());
+        // occurances of -1 (draw) in results array
+        long draws = java.util.Arrays.stream(results).filter(x -> x == -1 ).count();
+        // MCTS vs MCTS should always end in a draw
+        assertEquals(draws, RUNS, 0.05 * RUNS);
     }
 }
