@@ -14,10 +14,12 @@ public class Connect4State implements State<Connect4> {
     private int currentPlayer;
     private Random random;
     private RandomState randomState;
+    private int lastRow;
+    private int lastCol;
 
     public Connect4State() {
         this.board = new int [Connect4.ROWS][Connect4.COLUMNS];
-        this.currentPlayer = Connect4.PLAYER1;
+        this.currentPlayer = Connect4.red;
         this.randomState = new RandomState(Connect4.COLUMNS);
     }
 
@@ -39,43 +41,49 @@ public class Connect4State implements State<Connect4> {
 
     @Override
     public Optional<Integer> winner() {
-        // Check for horizontal wins
-        for (int row = 0; row < Connect4.ROWS; row++) {
-            for (int col = 0; col < Connect4.COLUMNS - 3; col++) {
-                if (board[row][col] != Connect4.EMPTY && board[row][col] == board[row][col + 1] && board[row][col] == board[row][col + 2] && board[row][col] == board[row][col + 3]) {
-                    return Optional.of(board[row][col]);
-                }
-            }
+        return winner(lastRow, lastCol);
+    }
+
+    public Optional<Integer> winner(int lastRow, int lastCol) {
+        if (lastRow == -1 || lastCol == -1) {
+            // No move has been made yet, so there's no winner
+            return Optional.empty();
         }
 
-        // Check for vertical wins
-        for (int col = 0; col < Connect4.COLUMNS; col++) {
-            for (int row = 0; row < Connect4.ROWS - 3; row++) {
-                if (board[row][col] != Connect4.EMPTY && board[row][col] == board[row + 1][col] && board[row][col] == board[row + 2][col] && board[row][col] == board[row + 3][col]) {
-                    return Optional.of(board[row][col]);
-                }
-            }
+        int player = board[lastRow][lastCol];
+
+        // Check horizontal
+        if (countConsecutive(player, lastRow, lastCol, 0, 1) >= 4) {
+            return Optional.of(player);
         }
 
-        // Check for diagonal wins (bottom left to top right)
-        for (int row = 3; row < Connect4.ROWS; row++) {
-            for (int col = 0; col < Connect4.COLUMNS - 3; col++) {
-                if (board[row][col] != Connect4.EMPTY && board[row][col] == board[row - 1][col + 1] && board[row][col] == board[row - 2][col + 2] && board[row][col] == board[row - 3][col + 3]) {
-                    return Optional.of(board[row][col]);
-                }
-            }
+        // Check vertical
+        if (countConsecutive(player, lastRow, lastCol, 1, 0) >= 4) {
+            return Optional.of(player);
         }
 
-        // Check for diagonal wins (top left to bottom right)
-        for (int row = 0; row < Connect4.ROWS - 3; row++) {
-            for (int col = 0; col < Connect4.COLUMNS - 3; col++) {
-                if (board[row][col] != Connect4.EMPTY && board[row][col] == board[row + 1][col + 1] && board[row][col] == board[row + 2][col + 2] && board[row][col] == board[row + 3][col + 3]) {
-                    return Optional.of(board[row][col]);
-                }
-            }
+        // Check diagonal (bottom left to top right)
+        if (countConsecutive(player, lastRow, lastCol, -1, 1) >= 4) {
+            return Optional.of(player);
         }
 
+        // Check diagonal (top left to bottom right)
+        if (countConsecutive(player, lastRow, lastCol, 1, 1) >= 4) {
+            return Optional.of(player);
+        }
+
+        // No winner yet
         return Optional.empty();
+    }
+
+    private int countConsecutive(int player, int row, int col, int dRow, int dCol) {
+        int count = 0;
+        while (row >= 0 && row < Connect4.ROWS && col >= 0 && col < Connect4.COLUMNS && board[row][col] == player) {
+            count++;
+            row += dRow;
+            col += dCol;
+        }
+        return count;
     }
 
     @Override
@@ -105,6 +113,8 @@ public class Connect4State implements State<Connect4> {
         for (int i = Connect4.ROWS - 1; i >= 0; i--) {
             if (board[i][move.getColumn()] == Connect4.EMPTY) {
                 board[i][move.getColumn()] = move.player();
+                lastRow = i;
+                lastCol = move.getColumn();
                 break;
             }
         }

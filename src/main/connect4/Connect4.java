@@ -6,8 +6,8 @@ import core.State;
 import java.util.Optional;
 
 public class Connect4 implements Game {
-    public static final int PLAYER1 = 1;
-    public static final int PLAYER2 = 2;
+    public static final int red = 1;
+    public static final int green = 2;
     public static final int EMPTY = 0;
     public static final int ROWS = 6;
     public static final int COLUMNS = 7;
@@ -30,7 +30,7 @@ public class Connect4 implements Game {
 
         Optional<Integer> winner = state.winner();
         if (winner.isPresent()) {
-            System.out.println("Player " + winner.get() + " wins!");
+            System.out.println("Player " + (winner.get() == red ? "red" : "green") + " wins!");
         } else {
             System.out.println("It's a draw!");
         }
@@ -42,6 +42,6 @@ public class Connect4 implements Game {
 
     @Override
     public int opener() {
-        return PLAYER1;
+        return red;
     }
 }
