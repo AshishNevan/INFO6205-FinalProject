@@ -254,7 +254,7 @@ public class Position {
         xxx = new int[]{last, last, last};
     }
 
-    private int[][] copyGrid() {
+    public int[][] copyGrid() {
         int[][] result = new int[gridSize][gridSize];
         for (int i = 0; i < gridSize; i++)
             result[i] = Arrays.copyOf(grid[i], gridSize);

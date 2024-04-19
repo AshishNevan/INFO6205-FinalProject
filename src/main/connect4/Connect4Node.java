@@ -1,29 +1,26 @@
-package tictactoe;
+package connect4;
 
 import core.Node;
 import core.State;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Optional;
+import java.util.*;
 
-public class TicTacToeNode implements Node<TicTacToe> {
+public class Connect4Node implements Node<Connect4> {
 
-    private final State<TicTacToe> state;
-    private final ArrayList<Node<TicTacToe>> children;
-    private final Node<TicTacToe> parent;
+    private final Connect4State state;
+    private final ArrayList<Node<Connect4>> children;
+    private final Node<Connect4> parent;
     private int wins;
     private int playouts;
 
-    public TicTacToeNode(State<TicTacToe> state) {
+    public Connect4Node(Connect4State state) {
         this.state = state;
         children = new ArrayList<>();
-        initializeNodeData(1-state.player());
+        initializeNodeData(3-state.player());
         parent = null;
     }
 
-    public TicTacToeNode(State<TicTacToe> state, Node<TicTacToe> parent, int currentPlayer) {
+    public Connect4Node(Connect4State state, Node<Connect4> parent, int currentPlayer) {
         this.state = state;
         children = new ArrayList<>();
         initializeNodeData(currentPlayer);
@@ -40,7 +37,7 @@ public class TicTacToeNode implements Node<TicTacToe> {
     /**
      * @return the State of the Game G that this Node represents.
      */
-    public State<TicTacToe> state() {
+    public Connect4State state() {
         return state;
     }
 
@@ -56,19 +53,26 @@ public class TicTacToeNode implements Node<TicTacToe> {
     }
 
     /**
-     * @return the children of this Node.
+     * Method to yield the children of this Node.
+     *
+     * @return a Collection of Nodes.
      */
-    public Collection<Node<TicTacToe>> children() {
+    @Override
+    public Collection<Node<Connect4>> children() {
         return children;
     }
+
+    /**
+     * @return the children of this Node.
+     */
 
     /**
      * Method to add a child to this Node.
      *
      * @param state the State for the new chile.
      */
-    public void addChild(State<TicTacToe> state) {
-        children.add(new TicTacToeNode(state, this, state.player()));
+    public void addChild(State<Connect4> state) {
+        children.add(new Connect4Node((Connect4State) state, this, state.player()));
     }
 
     /**
@@ -77,7 +81,7 @@ public class TicTacToeNode implements Node<TicTacToe> {
     public void backPropagate() {
         playouts = 0;
         wins = 0;
-        for (Node<TicTacToe> child : children) {
+        for (Node<Connect4> child : children) {
             wins += child.wins();
             playouts += child.playouts();
         }
@@ -88,7 +92,7 @@ public class TicTacToeNode implements Node<TicTacToe> {
         this.playouts = playouts;
     }
 
-    public Node<TicTacToe> getChildWithMaxWins() {
+    public Node<Connect4> getChildWithMaxWins() {
 //        return child with max wins
         return children.stream().max(Comparator.comparingInt(Node::wins)).orElse(null);
     }
@@ -117,7 +121,11 @@ public class TicTacToeNode implements Node<TicTacToe> {
         }
     }
 
-    public Node<TicTacToe> getParent() {
+    public Node<Connect4> getParent() {
         return parent;
+    }
+
+    public Collection<Node<Connect4>> getChildren() {
+        return children;
     }
 }
