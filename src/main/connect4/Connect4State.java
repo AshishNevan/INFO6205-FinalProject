@@ -23,6 +23,7 @@ public class Connect4State implements State<Connect4> {
         this.randomState = new RandomState(Connect4.COLUMNS);
         this.lastRow = -1;
         this.lastCol = -1;
+        this.random = new Random();
     }
 
     @Override
@@ -32,8 +33,71 @@ public class Connect4State implements State<Connect4> {
 
     @Override
     public boolean isTerminal() {
-        // Check for a win or a draw
-        return winner().isPresent() || moves(currentPlayer).isEmpty();
+        // Check for a win
+        if (hasFourInARow(Connect4.RED) || hasFourInARow(Connect4.BLUE)) {
+            return true;
+        }
+
+        // Check for a draw
+        for (int i = 0; i < Connect4.COLUMNS; i++) {
+            if (board[0][i] == Connect4.EMPTY) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean hasFourInARow(int player) {
+        // Check horizontal
+        for (int i = 0; i < Connect4.ROWS; i++) {
+            for (int j = 0; j < Connect4.COLUMNS - 3; j++) {
+                if (board[i][j] == player && board[i][j + 1] == player && board[i][j + 2] == player && board[i][j + 3] == player) {
+                    return true;
+                }
+            }
+        }
+
+        // Check vertical
+        for (int i = 0; i < Connect4.ROWS - 3; i++) {
+            for (int j = 0; j < Connect4.COLUMNS; j++) {
+                if (board[i][j] == player && board[i + 1][j] == player && board[i + 2][j] == player && board[i + 3][j] == player) {
+                    return true;
+                }
+            }
+        }
+
+        // Check diagonal (bottom left to top right)
+        for (int i = 3; i < Connect4.ROWS; i++) {
+            for (int j = 0; j < Connect4.COLUMNS - 3; j++) {
+                if (board[i][j] == player && board[i - 1][j + 1] == player && board[i - 2][j + 2] == player && board[i - 3][j + 3] == player) {
+                    return true;
+                }
+            }
+        }
+
+        // Check diagonal (top left to bottom right)
+        for (int i = 0; i < Connect4.ROWS - 3; i++) {
+            for (int j = 0; j < Connect4.COLUMNS - 3; j++) {
+                if (board[i][j] == player && board[i + 1][j + 1] == player && board[i + 2][j + 2] == player && board[i + 3][j + 3] == player) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+    @Override
+    public Optional<Integer> winner() {
+        if (hasFourInARow(Connect4.RED)) {
+            return Optional.of(Connect4.RED);
+        } else if (hasFourInARow(Connect4.BLUE)) {
+            return Optional.of(Connect4.BLUE);
+        } else {
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -41,10 +105,9 @@ public class Connect4State implements State<Connect4> {
         return currentPlayer;
     }
 
-    @Override
-    public Optional<Integer> winner() {
-        return winner(lastRow, lastCol);
-    }
+//    public Optional<Integer> winner() {
+//        return winner(lastRow, lastCol);
+//    }
 
     public Optional<Integer> winner(int lastRow, int lastCol) {
         if (lastRow == -1 || lastCol == -1) {

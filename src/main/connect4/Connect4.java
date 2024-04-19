@@ -27,29 +27,29 @@ public class Connect4 implements Game<Connect4> {
         this(new Random(seed));
     }
 
-    public static void main(String[] args) {
-        Connect4 game = new Connect4();
-        State<Connect4> state = game.start();
-        MCTS mcts = new MCTS((Connect4State) state);
-
-        while (!state.isTerminal()) {
-            Connect4Move move = mcts.findBestMove();
-            if (move != null) {
-                state = state.next(move);
-                ((Connect4State) state).printBoard();
-            } else {
-                // Handle the case where no valid move was found
-                System.out.println("No valid move found. Skipping player's turn.");
-            }
-        }
-
-        Optional<Integer> winner = state.winner();
-        if (winner.isPresent()) {
-            System.out.println("Player " + (winner.get() == RED ? "red" : "green") + " wins!");
-        } else {
-            System.out.println("It's a draw!");
-        }
-    }
+//    public static void main(String[] args) {
+//        Connect4 game = new Connect4();
+//        State<Connect4> state = game.start();
+//        MCTSConnect4 mcts = new MCTSConnect4((Connect4State) state);
+//
+//        while (!state.isTerminal()) {
+//            Connect4Move move = mcts.findBestMove();
+//            if (move != null) {
+//                state = state.next(move);
+//                ((Connect4State) state).printBoard();
+//            } else {
+//                // Handle the case where no valid move was found
+//                System.out.println("No valid move found. Skipping player's turn.");
+//            }
+//        }
+//
+//        Optional<Integer> winner = state.winner();
+//        if (winner.isPresent()) {
+//            System.out.println("Player " + (winner.get() == RED ? "red" : "green") + " wins!");
+//        } else {
+//            System.out.println("It's a draw!");
+//        }
+//    }
     @Override
     public State<Connect4> start() {
         return new Connect4State();
