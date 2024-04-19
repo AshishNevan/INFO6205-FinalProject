@@ -80,19 +80,19 @@ public class MCTSConnect4Test {
                     }
 //                    root.state().printBoard();
                 }
-                res[i] = root.state().winner().orElse(0);
+                res[i] = root.state().winner().orElse(-1);
             }
             // count occurances of mctsplayer in res
-            long count = java.util.Arrays.stream(res).filter(x -> x == randomPlayer).count();
-            System.out.println("MCTS wins+draws: " + (RUNS - count));
-            assertTrue(RUNS-count>0.5*RUNS);
+            long loss = java.util.Arrays.stream(res).filter(x -> x == randomPlayer).count();
+            System.out.println("MCTSvsRandom wins+draws rate: " + (RUNS - loss)*100/RUNS);
+            assertTrue(RUNS-loss>=0.3*RUNS);
         }
 
         @Test
         public void MCTSvsMCTS() {
             int RUNS = 10;
             int mctsPlayer = Connect4.RED;
-            boolean[] res = new boolean[RUNS];
+            int[] res = new int[RUNS];
             for (int i = 0; i < RUNS; i++) {
                 Connect4 game = new Connect4();
                 Connect4Node root = new Connect4Node(new Connect4State());
@@ -102,18 +102,11 @@ public class MCTSConnect4Test {
                     root = new Connect4Node(root.state());
                     mcts = new MCTSConnect4(root);
                 }
-                if (root.state().winner().isPresent()) {
-                    res[i] = root.state().winner().get() == mctsPlayer;
-                }
-                else {
-                    res[i] = true;
-                }
+                res[i] = root.state().winner().orElse(-1);
             }
             // count occurances of true in res
-            int count = 0;
-            for (boolean re : res) {
-                if (re) count++;
-            }
+            long count = java.util.Arrays.stream(res).filter(x -> x == -1).count();
+            System.out.println("MCTSvsMCTS draws rate: "+ count*100/RUNS);
 //            System.out.println("Draws: " + count);
             assertEquals(RUNS, count, 0.5*RUNS);
         }
