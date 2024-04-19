@@ -19,7 +19,7 @@ public class Connect4State implements State<Connect4> {
 
     public Connect4State() {
         this.board = new int [Connect4.ROWS][Connect4.COLUMNS];
-        this.currentPlayer = Connect4.red;
+        this.currentPlayer = Connect4.RED;
         this.randomState = new RandomState(Connect4.COLUMNS);
         this.lastRow = -1;
         this.lastCol = -1;
