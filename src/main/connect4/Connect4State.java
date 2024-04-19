@@ -141,4 +141,19 @@ public class Connect4State implements State<Connect4> {
         }
         System.out.println();
     }
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Connect4State) {
+            Connect4State other = (Connect4State) obj;
+            for (int i = 0; i < Connect4.ROWS; i++) {
+                for (int j = 0; j < Connect4.COLUMNS; j++) {
+                    if (board[i][j] != other.board[i][j]) {
+                        return false;
+                    }
+                }
+            }
+            return currentPlayer == other.currentPlayer;
+        }
+        return false;
+    }
 }
