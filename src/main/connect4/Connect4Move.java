@@ -12,20 +12,22 @@ public class Connect4Move implements Move<Connect4> {
         this.column = column;
     }
 
-    @Override
     public Connect4 game() {
         return new Connect4();
+    }
+
+    public State<Connect4> next(State<Connect4> state) {
+        Connect4State nextState = ((Connect4State) state).clone();
+        nextState.makeMove(this);
+        return nextState;
+    }
+
+    public int getColumn() {
+        return column;
     }
 
     @Override
     public int player() {
         return player;
-    }
-
-    @Override
-    public State<Connect4> next(State<Connect4> state) {
-        Connect4State nextState = ((Connect4State) state).clone();
-        nextState.makeMove(this);
-        return nextState;
     }
 }
