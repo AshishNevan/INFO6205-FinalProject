@@ -7,20 +7,20 @@ import java.util.*;
 
 public class Connect4Node implements Node<Connect4> {
 
-    private final State<Connect4> state;
+    private final Connect4State state;
     private final ArrayList<Node<Connect4>> children;
     private final Node<Connect4> parent;
     private int wins;
     private int playouts;
 
-    public Connect4Node(State<Connect4> state) {
+    public Connect4Node(Connect4State state) {
         this.state = state;
         children = new ArrayList<>();
-        initializeNodeData(1-state.player());
+        initializeNodeData(3-state.player());
         parent = null;
     }
 
-    public Connect4Node(State<Connect4> state, Node<Connect4> parent, int currentPlayer) {
+    public Connect4Node(Connect4State state, Node<Connect4> parent, int currentPlayer) {
         this.state = state;
         children = new ArrayList<>();
         initializeNodeData(currentPlayer);
@@ -37,7 +37,7 @@ public class Connect4Node implements Node<Connect4> {
     /**
      * @return the State of the Game G that this Node represents.
      */
-    public State<Connect4> state() {
+    public Connect4State state() {
         return state;
     }
 
@@ -72,7 +72,7 @@ public class Connect4Node implements Node<Connect4> {
      * @param state the State for the new chile.
      */
     public void addChild(State<Connect4> state) {
-        children.add(new Connect4Node(state, this, state.player()));
+        children.add(new Connect4Node((Connect4State) state, this, state.player()));
     }
 
     /**

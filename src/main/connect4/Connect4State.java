@@ -13,17 +13,17 @@ public class Connect4State implements State<Connect4> {
     private int[][] board;
     private int currentPlayer;
     private Random random;
-    private RandomState randomState;
-    private int lastRow;
-    private int lastCol;
+//    private RandomState randomState;
+//    private int lastRow;
+//    private int lastCol;
 
     public Connect4State() {
         this.board = new int [Connect4.ROWS][Connect4.COLUMNS];
         this.currentPlayer = Connect4.RED;
-        this.randomState = new RandomState(Connect4.COLUMNS);
-        this.lastRow = -1;
-        this.lastCol = -1;
-        this.random = new Random();
+//        this.randomState = new RandomState(Connect4.COLUMNS);
+//        this.lastRow = -1;
+//        this.lastCol = -1;
+        this.random = new Random(System.currentTimeMillis());
     }
 
     @Override
@@ -178,8 +178,8 @@ public class Connect4State implements State<Connect4> {
         for (int i = Connect4.ROWS - 1; i >= 0; i--) {
             if (board[i][move.getColumn()] == Connect4.EMPTY) {
                 board[i][move.getColumn()] = move.player();
-                lastRow = i;
-                lastCol = move.getColumn();
+//                lastRow = i;
+//                lastCol = move.getColumn();
                 currentPlayer = 3 - currentPlayer;
                 break;
             }

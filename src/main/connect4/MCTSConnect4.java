@@ -2,9 +2,10 @@ package connect4;
 
 import core.Move;
 import core.Node;
-import tictactoe.TicTacToeNode;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Random;
 
 public class MCTSConnect4 {
@@ -14,6 +15,15 @@ public class MCTSConnect4 {
 
     public MCTSConnect4(Connect4Node root) {
         this.root = root;
+    }
+
+    public static double uctValue(
+            int totalVisit, double nodeWinScore, int nodeVisit) {
+        if (nodeVisit == 0) {
+            return Integer.MAX_VALUE;
+        }
+        return (nodeWinScore / (double) nodeVisit)
+                + 1.41 * Math.sqrt(Math.log(totalVisit) / (double) nodeVisit);
     }
 
     public Connect4Node getBestMove() {
@@ -33,7 +43,7 @@ public class MCTSConnect4 {
     }
 
     void expand(Connect4Node node) {
-        Connect4State currentState = (Connect4State) node.state();
+        Connect4State currentState = node.state();
         Collection<Move<Connect4>> possibleMoves = currentState.moves(currentState.player());
         for (Move<Connect4> possibleMove : possibleMoves) {
             node.addChild(currentState.next(possibleMove));
@@ -45,14 +55,17 @@ public class MCTSConnect4 {
     }
 
     public Connect4Node select(Connect4Node node) {
-        while (!node.getChildren().isEmpty()) {
-            node = (Connect4Node) node.getChildren().stream().max((node1, node2) -> Double.compare(uctValue((Connect4Node) node1), uctValue((Connect4Node) node2))).orElseThrow();
+        while (!node.children().isEmpty()) {
+            node = getBestChild(node);
         }
         return node;
     }
 
-    private double uctValue(Connect4Node node) {
-        return node.wins() / (double) node.playouts() + Math.sqrt(2 * Math.log(node.getParent().wins()) / node.playouts());
+    private Connect4Node getBestChild(Connect4Node node) {
+        return (Connect4Node) Collections.max(
+                node.children(),
+                Comparator.comparing(c -> uctValue(node.playouts(),
+                        c.wins(), c.playouts())));
     }
 
     public Node<Connect4> simulate(Connect4Node node) {
