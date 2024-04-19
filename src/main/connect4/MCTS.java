@@ -2,10 +2,7 @@ package connect4;
 
 import core.Move;
 
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.Random;
-import java.util.List;
+import java.util.*;
 
 public class MCTS {
     private MCTSNode root;
@@ -23,9 +20,14 @@ public class MCTS {
             backPropagate(node, result);
         }
 
+        // Check if the root node has children
+        if (root.getChildren().isEmpty()) {
+            // If not, expand the root node
+            root.expand();
+        }
+
         List<MCTSNode> children = root.getChildren();
         Optional<MCTSNode> bestNode = children.stream().max((node1, node2) -> Double.compare(node1.getWins() / (double) node1.getVisits(), node2.getWins() / (double) node2.getVisits()));
-
         if (bestNode.isPresent()) {
             Connect4Move bestMove = (Connect4Move) bestNode.get().getMove();
             return bestMove;

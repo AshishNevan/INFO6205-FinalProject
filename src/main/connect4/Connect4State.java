@@ -21,6 +21,8 @@ public class Connect4State implements State<Connect4> {
         this.board = new int [Connect4.ROWS][Connect4.COLUMNS];
         this.currentPlayer = Connect4.red;
         this.randomState = new RandomState(Connect4.COLUMNS);
+        this.lastRow = -1;
+        this.lastCol = -1;
     }
 
     @Override
@@ -115,10 +117,10 @@ public class Connect4State implements State<Connect4> {
                 board[i][move.getColumn()] = move.player();
                 lastRow = i;
                 lastCol = move.getColumn();
+                currentPlayer = 3 - currentPlayer;
                 break;
             }
         }
-        currentPlayer = 3 - currentPlayer;
     }
 
     public Connect4State clone() {
@@ -137,5 +139,6 @@ public class Connect4State implements State<Connect4> {
             }
             System.out.println();
         }
+        System.out.println();
     }
 }

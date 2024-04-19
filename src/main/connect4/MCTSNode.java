@@ -3,6 +3,7 @@ package connect4;
 import core.Move;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class MCTSNode {
@@ -20,6 +21,16 @@ public class MCTSNode {
         this.wins = 0;
         this.visits = 0;
         this.move = move;
+    }
+
+    public void expand() {
+        Collection<Move<Connect4>> moves = state.moves(state.player());
+        for (Move<Connect4> move : moves) {
+            Connect4State nextState = (Connect4State) state.next(move);
+            MCTSNode childNode = new MCTSNode(nextState, move);
+            childNode.parent = this;
+            this.children.add(childNode);
+        }
     }
 
     public Connect4State getState() {
