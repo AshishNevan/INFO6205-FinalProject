@@ -18,57 +18,6 @@ public class MCTS {
         this.root = root;
     }
 
-    public static void main(String[] args) {
-        TicTacToe game = new TicTacToe();
-        TicTacToeNode root = new TicTacToeNode(game.new TicTacToeState());
-        MCTS mcts = new MCTS(root);
-//        int user = 1 - game.opener();
-//        Scanner sc = new Scanner(System.in);
-//        System.out.println(((TicTacToe.TicTacToeState) root.state()).position().render());
-//        while (!root.state().isTerminal()) {
-//            if (root.state().player() == user) {
-//                try {
-//                    System.out.println("Enter X,Y");
-//                    String userMove = sc.nextLine();
-////                    System.out.println("User input is " + userMove);
-//                    String[] XY = userMove.split(",");
-//                    Position newPosition = ((TicTacToe.TicTacToeState) root.state()).position().move(TicTacToe.O, Integer.parseInt(XY[0]), Integer.parseInt(XY[1]));
-//                    Node<TicTacToe> childNode = findChildWithPosition(root, newPosition);
-//                    System.out.println(childNode.state().toString());
-//                    root = (TicTacToeNode) childNode;
-//                } catch (Exception e) {
-//                    System.out.println(e);
-//                    System.out.println("Enter valid input");
-//                }
-//            } else {
-//                root = mcts.getBestMove();
-//                System.out.println("Player " + (root.state().player() == 0 ? "X" : "O") + " makes a move.");
-//                System.out.println(((TicTacToe.TicTacToeState) root.state()).position().render());
-//                mcts = new MCTS(root);
-//            }
-//        }
-
-        while (!root.state().isTerminal()) {
-            root = mcts.getBestMove();
-            System.out.println("Player " + (root.state().player() == 0 ? "X" : "O") + " makes a move.");
-            System.out.println(((TicTacToe.TicTacToeState) root.state()).position().render());
-            root = new TicTacToeNode(root.state());
-            mcts = new MCTS(root);
-        }
-
-        if (root.state().winner().isPresent()) {
-            String res;
-            switch (root.state().winner().get()) {
-                case TicTacToe.X -> res = "X";
-                case TicTacToe.O -> res = "O";
-                default -> res = ".";
-            }
-            System.out.println("TicTacToe: winner is: " + res);
-        } else {
-            System.out.println("Draw");
-        }
-    }
-
     public static double uctValue(
             int totalVisit, double nodeWinScore, int nodeVisit) {
         if (nodeVisit == 0) {
@@ -106,23 +55,6 @@ public class MCTS {
                 node.children(),
                 Comparator.comparing(c -> uctValue(node.playouts(),
                         c.wins(), c.playouts())));
-    }
-
-    private TicTacToeNode UnvisitedChild(TicTacToeNode node) {
-        // return first child with playouts == 0
-        if (node.children().isEmpty()) {
-            expand(node);
-            return node;
-        }
-        return (TicTacToeNode) node.children().stream().filter(child -> child.playouts() == 0).findFirst().orElseThrow(() -> new RuntimeException("No unvisited children"));
-    }
-
-    public boolean fullyExpanded(TicTacToeNode node) {
-        // true if all the children have playouts > 0
-        if (node.children().isEmpty()) {
-            return false;
-        }
-        return node.children().stream().allMatch(child -> child.playouts() > 0);
     }
 
     public void expand(TicTacToeNode node) {
